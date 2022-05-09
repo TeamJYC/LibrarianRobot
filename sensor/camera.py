@@ -1,30 +1,29 @@
 import cv2
-from threading import Timer
+import time
 
-DELAY_N_SECONDS = 3
 
 capture = cv2.VideoCapture(0)
 
-def get_frame():
+def get_realtime_frame():
     ret, frame = capture.read()
-    print("Camera on ...")
     return frame
 
-def get_frame_every_nseconds(frame):
-    img_source = frame
-    timer = Timer(DELAY_N_SECONDS, get_frame_every_nseconds(frame))
-    cv2.imshow('a', img_source)
-    timer.start()
-    return img_source
+
+def get_frame_every_nseconds():
+    while True:
+        ret, frame = capture.read()
+        cv2.imshow('b',frame)
+        time.sleep(2)
+        key = cv2.waitKey(10)
+        if key == 27: # Esc
+            break
+        return frame
     
 def camera_release():
     capture.release()
 
 if __name__ == "__main__":
-    flag = 0
-    frame = get_frame()
-    if flag == 0:
-        img_source = get_frame_every_nseconds(frame)
-        flag = 1
+    get_frame_every_nseconds()
     cv2.destroyAllWindows()
+    camera_release()
     
