@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 
 
-def watershed(img):
+def watershed(img_gray, img_source):
     
-    img_shape = np.zeros_like(img)
+    img_shape = np.zeros_like(img_gray)
     
-    ret, img_thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU) # 이진화
+    ret, img_thresh = cv2.threshold(img_gray, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU) # 이진화
 
     kernel = np.ones((3,3),np.uint8)
     
@@ -24,13 +24,13 @@ def watershed(img):
     markers = markers + 1
     markers[unknown == 255] = 0
     
-    markers = cv2.watershed(img, markers)
+    markers = cv2.watershed(img_source, markers)
     img_shape[markers == -1] = 255
     
     return img_shape
 
 
-def perspectivetransformation(img):
+def perspective_transformation(img, img_source):
     
     contours, ret = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE) # 컨투어링(테두리)
 
@@ -58,7 +58,7 @@ def perspectivetransformation(img):
     
     M = cv2.getPerspectiveTransform(pts1, pts2)
     
-    img_warp = cv2.warpPerspective(img, M, (500,500))
+    img_warp = cv2.warpPerspective(img_source, M, (500,500))
     
     return img_warp
 
@@ -66,12 +66,6 @@ def perspectivetransformation(img):
 def clache(img):
     img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
 
-    #--② 밝기 채널에 대해서 이퀄라이즈 적용
-    img_eq = img_yuv.copy()
-    img_eq[:,:,0] = cv2.equalizeHist(img_eq[:,:,0])
-    img_eq = cv2.cvtColor(img_eq, cv2.COLOR_YUV2BGR)
-
-    #--③ 밝기 채널에 대해서 CLAHE 적용
     img_clahe = img_yuv.copy()
     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8)) #CLAHE 생성
     img_clahe[:,:,0] = clahe.apply(img_clahe[:,:,0])           #CLAHE 적용
@@ -79,4 +73,22 @@ def clache(img):
     
     return img_clahe
 
-
+if __name__ == "__main__":
+    img = cv2.imread('test.jpg', cv2.IMREAD_COLOR)
+    
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    img_watershed = watershed(img_gray, img)
+    
+    img_warp = perspective_transformation(img_watershed, img)
+    
+    img_clache = clache(img_warp)
+    
+    img_gray2 = cv2.cvtColor(img_clache, cv2.COLOR_BGR2GRAY)
+    ret, img_thresh = cv2.threshold(img_gray2, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+   
+    cv2.imshow('img',img_thresh)
+    
+    key = cv2.waitKey(33)
+    if key == 27: # Esc
+        cv2.destroyAllWindows()

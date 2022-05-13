@@ -14,6 +14,11 @@ def camera_release():
     capture.release()
 
 if __name__ == "__main__":
-    get_frame_every_nseconds()
+    while True:
+        frame = get_frame_every_nseconds()
+        cv2.imshow('img', frame)
+        key = cv2.waitKey(33)
+        if key == 27: # Esc
+            break
     cv2.destroyAllWindows()
     camera_release()
