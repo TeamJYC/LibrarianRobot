@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import pytesseract
 
 
 def watershed(img_gray, img_source):
@@ -88,6 +89,7 @@ if __name__ == "__main__":
     ret, img_thresh = cv2.threshold(img_gray2, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
    
     cv2.imshow('img',img_thresh)
+    text = pytesseract.image_to_string(img_thresh, lang="kor+eng")
     
     key = cv2.waitKey(33)
     if key == 27: # Esc

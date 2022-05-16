@@ -27,8 +27,6 @@ while True:
     if (destination != None):
         print(name[destination] + "분류입니다.")
         break
-    
-    
     key = cv2.waitKey(33)
     if key == 27: # Esc
         break

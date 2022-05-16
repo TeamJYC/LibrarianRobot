@@ -1,7 +1,7 @@
 import cv2
 import time
 
-DELAY_N_SECONDS = 3
+DELAY_N_SECONDS = 1
 
 capture = cv2.VideoCapture(0)
 

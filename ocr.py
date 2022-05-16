@@ -27,7 +27,9 @@ def get_classnumber(text):
             call_sign[2] = text[idx]
             call_sign[1] = text[idx-1]
             call_sign[0] = text[idx-2]
-            queue.append(call_sign[0])
+            queue.append(call_sign[0])  
+            
+            print(''.join(call_sign))
             
             if len(queue) == 10:
                 queue.pop(0)
